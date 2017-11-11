@@ -73,30 +73,28 @@ func main() {
     // iterate through each mapping
     for i := range mappings {
       mapping := strings.Split(mappings[i], ":")
-      log.WithFields(log.Fields{
-        "pingdom check id": mapping[0],
-        "lambstatus metric id": mapping[1],
-      }).Info("processing mapping ", i)
-
       checkId, err := strconv.Atoi(mapping[0])
       metricId := mapping[1]
-
-      // get details for the check
       checkDetails, _ := pClient.Checks.Read(checkId)
-      log.Info("Check Details: %+v\n", checkDetails)
+      log.Debug("check details: %+v\n", checkDetails)
       lastResponseTime := checkDetails.LastResponseTime
       lastTestTime := checkDetails.LastTestTime
 
-      log.Info(fmt.Sprintf("Last Response Time: %vms", lastResponseTime))
-      log.Info(fmt.Sprintf("Last Test Time: %v ", lastTestTime))
-
       t := time.Unix(lastTestTime, 0).Add(1).UTC().Format(time.RFC3339Nano)
+      timeStamp := fmt.Sprintf("%v", lastResponseTime)
+      var jsonPayLoad = []byte("{\""+metricId+`": [{"timestamp": "`+t+`", "value": `+timeStamp+`}]}`)
 
-      var jsonPayLoad = []byte("{\""+metricId+`": [{"timestamp": "`+t+`", "value": `+fmt.Sprintf("%v", lastResponseTime)+`}]}`)
-      log.Info("JSON payload:", string(jsonPayLoad[:]))
+      log.WithFields(log.Fields{
+        "pingdom check id": checkId,
+        "lambstatus metric id": metricId,
+        "last response time": lastResponseTime,
+        "last test time": lastTestTime,
+        "timestamp": timeStamp,
+      }).Info("processing mapping ", i)
+      log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
       url := c.String("lambstatus-endpoint") + "/prod/v0/metrics/data"
-      log.Info("POST:", url)
+      log.Debug("POST: ", url)
 
       // send to lambstatus
       req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayLoad))
@@ -110,10 +108,10 @@ func main() {
       }
       defer resp.Body.Close()
 
-      log.Info("response Status:", resp.Status)
-      log.Info("response Headers:", resp.Header)
+      log.Debug("response: ", resp.Status)
+      log.Debug("response headers: ", resp.Header)
       body, _ := ioutil.ReadAll(resp.Body)
-      log.Info("response Body:", string(body))
+      log.Debug("response body: ", string(body))
     }
 
     return nil
