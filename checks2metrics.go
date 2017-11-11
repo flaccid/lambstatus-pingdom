@@ -100,7 +100,7 @@ func main() {
         "lambstatus metric id": metricId,
         "last response time": lastResponseTime,
         "last test time": lastTestTime,
-        "timestamp": dateStamp,
+        "datestamp": dateStamp,
       }).Info(i, " ", checkDetails.Name)
       log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
