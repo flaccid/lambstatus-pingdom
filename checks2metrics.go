@@ -84,7 +84,10 @@ func main() {
       mapping := strings.Split(mappings[i], ":")
       checkId, err := strconv.Atoi(mapping[0])
       metricId := mapping[1]
-      checkDetails, _ := pClient.Checks.Read(checkId)
+      checkDetails, err := pClient.Checks.Read(checkId)
+      if err != nil {
+        log.Fatal(err)
+      }
       log.Debug("check details: %+v\n", checkDetails)
       lastResponseTime := checkDetails.LastResponseTime
       lastTestTime := checkDetails.LastTestTime
