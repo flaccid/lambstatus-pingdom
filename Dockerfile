@@ -1,4 +1,4 @@
-FROM scratch
+FROM centurylink/ca-certs
 
 COPY bin/checks2metrics /checks2metrics
 
