@@ -77,7 +77,7 @@ func main() {
 
     // split the map by comma
     mappings := strings.Split(checkToMetricMap, ",")
-    log.Info(len(mappings), " checks to ship")
+    log.Info(len(mappings), " checks to ship to lambstatus")
 
     // iterate through each mapping
     for i := range mappings {
@@ -101,7 +101,7 @@ func main() {
         "last response time": lastResponseTime,
         "last test time": lastTestTime,
         "timestamp": dateStamp,
-      }).Info("ship ", i)
+      }).Info("ship ", i, " (",checkDetails.Name, ")")
       log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
       url := c.String("lambstatus-endpoint") + "/prod/v0/metrics/data"
