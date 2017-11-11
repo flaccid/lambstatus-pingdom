@@ -29,6 +29,9 @@ docker-push:: ## Pushes the docker image to the registry
 
 docker-release:: docker-build docker-push ## Builds and pushes the docker image to the registry
 
+run:: ## Runs the executable
+		bin/checks2metrics
+
 # A help target including self-documenting targets (see the awk statement)
 define HELP_TEXT
 Usage: make [TARGET]... [MAKEVAR1=SOMETHING]...
