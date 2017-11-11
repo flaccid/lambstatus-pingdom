@@ -11,4 +11,5 @@ jobs:
       - image: circleci/golang:1.8
     steps:
       - checkout
+      - run: go get ./...
       - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/checks2metrics -a -ldflags '-extldflags "-static"' checks2metrics.go
