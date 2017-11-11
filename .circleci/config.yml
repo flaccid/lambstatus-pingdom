@@ -11,18 +11,18 @@ jobs:
       - image: circleci/golang:1.8
     steps:
       - checkout
-  build-docker:
-    docker:
-      - image: docker
-    steps:
-      - setup_remote_docker
-      - run: docker info
-      - run:
-          name: Build docker image
-          command: |
-            docker build -t flaccid/checks2metrics .
-      - deploy:
-          name: Push docker image to Docker Hub
-          command: |
-            docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
-            docker push flaccid/checks2metrics
+    build-docker:
+      docker:
+        - image: docker
+      steps:
+        - setup_remote_docker
+        - run: docker info
+        - run:
+            name: Build docker image
+            command: |
+              docker build -t flaccid/checks2metrics .
+        - deploy:
+            name: Push docker image to Docker Hub
+            command: |
+              docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
+              docker push flaccid/checks2metrics
