@@ -1,0 +1,15 @@
+version: '2'
+services:
+  checks2metrics:
+    image: flaccid/checks2metrics
+    environment:
+      PINGDOM_USERNAME: ${PINGDOM_USERNAME}
+      PINGDOM_PASSWORD: ${PINGDOM_PASSWORD}
+      PINGDOM_API_KEY: ${PINGDOM_API_KEY}
+      LAMBSTATUS_ENDPOINT_URL: ${LAMBSTATUS_ENDPOINT_URL}
+      LAMBSTATUS_API_KEY: ${LAMBSTATUS_API_KEY}
+      CHECK_TO_METRIC_MAP: ${CHECK_TO_METRIC_MAP}
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
