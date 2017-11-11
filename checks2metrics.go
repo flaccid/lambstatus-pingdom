@@ -101,7 +101,7 @@ func main() {
         "last response time": lastResponseTime,
         "last test time": lastTestTime,
         "timestamp": dateStamp,
-      }).Info("-> ", i, " ", checkDetails.Name)
+      }).Info(i, " ", checkDetails.Name)
       log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
       url := c.String("lambstatus-endpoint") + "/prod/v0/metrics/data"
