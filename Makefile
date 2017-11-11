@@ -8,16 +8,26 @@ WORKING_DIR := $(shell pwd)
 
 .DEFAULT_GOAL := build
 
-.PHONY: build push
+.PHONY: docker-build docker-push
 
-release:: build push ## Builds and pushes the docker image to the registry
+build:: ## Builds a binary
+		@go build ./...
 
-push:: ## Pushes the docker image to the registry
-		@docker push $(IMAGE_TAG)
+build-static-linux:: ## Builds a static linux binary
+		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+			go build \
+			-o bin/checks2metrics \
+			-a -ldflags '-extldflags "-static"' \
+				checks2metrics.go
 
-build:: ## Builds the docker image locally
+docker-build:: ## Builds the docker image locally
 		@docker build --pull \
 		-t $(IMAGE_TAG) $(WORKING_DIR)
+
+docker-push:: ## Pushes the docker image to the registry
+		@docker push $(IMAGE_TAG)
+
+docker-release:: docker-build docker-push ## Builds and pushes the docker image to the registry
 
 # A help target including self-documenting targets (see the awk statement)
 define HELP_TEXT
