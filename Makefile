@@ -10,8 +10,8 @@ WORKING_DIR := $(shell pwd)
 
 .PHONY: docker-build docker-push
 
-build:: ## Builds a binary
-		@go build ./...
+build:: ## Builds the checks2metrics binary
+		@go build -o bin/checks2metrics checks2metrics.go
 
 build-static-linux:: ## Builds a static linux binary
 		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
