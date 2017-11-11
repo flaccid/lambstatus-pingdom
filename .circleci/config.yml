@@ -6,10 +6,15 @@ machine:
 
 jobs:
   build:
+    working_directory: /go/src/github.com/flaccid/lambstatus-pingdom
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - checkout
+  build-docker:
     docker:
       - image: docker
     steps:
-      - checkout
       - setup_remote_docker
       - run: docker info
       - run:
