@@ -6,7 +6,7 @@ IMAGE_TAG = $(DOCKER_REGISTRY)/$(IMAGE_ORG)/$(IMAGE_NAME):$(IMAGE_VERSION)
 
 WORKING_DIR := $(shell pwd)
 
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := help
 
 .PHONY: docker-build docker-push
 
