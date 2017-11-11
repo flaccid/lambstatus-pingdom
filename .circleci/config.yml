@@ -6,22 +6,9 @@ machine:
 
 jobs:
   build:
+    working_directory: /go/src/github.com/flaccid/lambstatus-pingdom
     docker:
       - image: circleci/golang:1.8
-        working_directory: /go/src/github.com/flaccid/lambstatus-pingdom
-        steps:
-          - checkout
-          - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/checks2metrics -a -ldflags '-extldflags "-static"' checks2metrics.go
-      - image: docker
-        steps:
-          - setup_remote_docker
-          - run: docker info
-          - run:
-              name: Build docker image
-              command: |
-                docker build -t flaccid/checks2metrics .
-          - deploy:
-              name: Push docker image to Docker Hub
-              command: |
-                docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
-                docker push flaccid/checks2metrics
+    steps:
+      - checkout
+      - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/checks2metrics -a -ldflags '-extldflags "-static"' checks2metrics.go
