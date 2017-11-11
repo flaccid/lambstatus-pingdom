@@ -124,6 +124,7 @@ func main() {
       body, _ := ioutil.ReadAll(resp.Body)
       log.Debug("response body: ", string(body))
     }
+    log.Info("all checks shipped")
 
     return nil
   }
