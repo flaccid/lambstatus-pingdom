@@ -53,21 +53,22 @@ func main() {
       Name:  "check-to-metric-map",
       EnvVar: "CHECK_TO_METRIC_MAP",
     },
-    cli.BoolTFlag{
+    cli.BoolFlag{
       Name:  "debug",
       Usage: "set debug log level",
     },
 	}
 
   app.Action = func(c *cli.Context) error {
-    if c.Bool("debug") {
-      log.SetLevel(log.DebugLevel)
-    }
-
     log.WithFields(log.Fields{
       "lambstatus endpoint url": c.String("lambstatus-endpoint"),
       "check2metric map": c.String("check-to-metric-map"),
     }).Info("starting")
+
+    if c.Bool("debug") {
+      log.Info("debug enabled")
+      log.SetLevel(log.DebugLevel)
+    }
 
     pClient := pingdom.NewClient(c.String("pingdom-user"),
                                  c.String("pingdom-pass"),
