@@ -80,16 +80,15 @@ func main() {
       lastResponseTime := checkDetails.LastResponseTime
       lastTestTime := checkDetails.LastTestTime
 
-      t := time.Unix(lastTestTime, 0).Add(1).UTC().Format(time.RFC3339Nano)
-      timeStamp := fmt.Sprintf("%v", lastResponseTime)
-      var jsonPayLoad = []byte("{\""+metricId+`": [{"timestamp": "`+t+`", "value": `+timeStamp+`}]}`)
+      dateStamp := time.Unix(lastTestTime, 0).Add(1).UTC().Format(time.RFC3339Nano)
+      var jsonPayLoad = []byte("{\""+metricId+`": [{"timestamp": "` + dateStamp + `", "value": ` + fmt.Sprintf("%v", lastResponseTime) + `}]}`)
 
       log.WithFields(log.Fields{
         "pingdom check id": checkId,
         "lambstatus metric id": metricId,
         "last response time": lastResponseTime,
         "last test time": lastTestTime,
-        "timestamp": timeStamp,
+        "timestamp": dateStamp,
       }).Info("processing mapping ", i)
       log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
