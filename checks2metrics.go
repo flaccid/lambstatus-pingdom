@@ -121,7 +121,10 @@ func main() {
 
       log.Debug("response: ", resp.Status)
       log.Debug("response headers: ", resp.Header)
-      body, _ := ioutil.ReadAll(resp.Body)
+      body, err := ioutil.ReadAll(resp.Body)
+      if err != nil {
+        log.Fatal(err)
+      }
       log.Debug("response body: ", string(body))
     }
     log.Info("all checks shipped")
