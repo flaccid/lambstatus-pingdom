@@ -104,13 +104,14 @@ func main() {
       }).Info(i, " ", checkDetails.Name)
       log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
-      url := c.String("lambstatus-endpoint") + "/prod/v0/metrics/data"
+      url := c.String("lambstatus-endpoint") + "/api/v0/metrics/data"
       log.Debug("POST: ", url)
 
       // send to lambstatus
       req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayLoad))
       req.Header.Set("x-api-key", c.String("lambstatus-api-key"))
       req.Header.Set("Content-Type", "application/json")
+      log.Debug("request", req)
 
       client := &http.Client{}
       resp, err := client.Do(req)
@@ -118,14 +119,18 @@ func main() {
         panic(err)
       }
       defer resp.Body.Close()
-
-      log.Debug("response: ", resp.Status)
-      log.Debug("response headers: ", resp.Header)
       body, err := ioutil.ReadAll(resp.Body)
       if err != nil {
         log.Fatal(err)
       }
+
+      log.Debug("response status: ", resp.Status)
+      log.Debug("response headers: ", resp.Header)
       log.Debug("response body: ", string(body))
+
+      if resp.StatusCode != 200 {
+        log.Error("failed to post metric: ", resp.Status, " ", string(body))
+      }
     }
     log.Info("all checks shipped")
 
