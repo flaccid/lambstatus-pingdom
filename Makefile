@@ -5,6 +5,7 @@ IMAGE_ORG = flaccid
 IMAGE_TAG = $(DOCKER_REGISTRY)/$(IMAGE_ORG)/$(IMAGE_NAME):$(IMAGE_VERSION)
 
 WORKING_DIR := $(shell pwd)
+ROLE_POLICY := $(shell cat role_policy.json)
 
 .DEFAULT_GOAL := help
 
@@ -28,6 +29,33 @@ docker-push:: ## Pushes the docker image to the registry
 		@docker push $(IMAGE_TAG)
 
 docker-release:: docker-build docker-push ## Builds and pushes the docker image to the registry
+
+lambda-attach-iam-role-policy:: ## Attaches the IAM role policy
+		aws iam attach-role-policy \
+  		--role-name lambda_basic_execution \
+  		--policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole \
+  			|| exit 1
+
+lambda-create-iam-role:: ## Creates the AWS IAM role for Lambda
+		aws iam create-role \
+  		--role-name lambda_basic_execution \
+  		--assume-role-policy-document '$(ROLE_POLICY)' || exit 1
+
+lambda-create-function:: ## Creates the AWS Lambda function
+		aws lambda create-function \
+  		--function-name checks2metrics \
+  		--zip-file fileb://handler.zip \
+  		--role $(shell aws iam get-role --role-name lambda_basic_execution --query 'Role.Arn' --output text) \
+  		--runtime python2.7 \
+  		--handler handler.Handle || exit 1
+
+lambda-invoke-function:: ## Invokes the AWS Lambda function
+		aws lambda invoke \
+  		--function-name checks2metrics \
+  		--invocation-type RequestResponse \
+  		--log-type Tail  /dev/stderr \
+  		--query 'LogResult' \
+  		--output text
 
 run:: ## Runs the executable
 		bin/checks2metrics
