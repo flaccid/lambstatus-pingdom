@@ -12,14 +12,14 @@ ROLE_POLICY := $(shell cat role_policy.json)
 .PHONY: docker-build docker-push
 
 build:: ## Builds the checks2metrics binary
-		@go build -o bin/checks2metrics checks2metrics.go
+		@go build -o bin/checks2metrics cli/checks2metrics.go
 
 build-static-linux:: ## Builds a static linux binary
 		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 			go build \
 			-o bin/checks2metrics \
 			-a -ldflags '-extldflags "-static"' \
-				checks2metrics.go
+				cli/checks2metrics.go
 
 docker-build:: ## Builds the docker image locally
 		@docker build --pull \
