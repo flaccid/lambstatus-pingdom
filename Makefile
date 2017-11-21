@@ -14,9 +14,6 @@ ROLE_POLICY := $(shell cat role_policy.json)
 build:: ## Builds the checks2metrics binary
 		@go build -o bin/checks2metrics cli/checks2metrics.go
 
-build-shim:: ## Builds the shim via docker
-		@make -f Makefile.shim
-
 build-static-linux:: ## Builds a static linux binary
 		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 			go build \
@@ -38,6 +35,9 @@ lambda-attach-iam-role-policy:: ## Attaches the IAM role policy
   		--role-name lambda_basic_execution \
   		--policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole \
   			|| exit 1
+
+lambda-build-pack:: ## Builds the shim via docker and packs into handler.zip
+		@make -f Makefile.shim
 
 lambda-create-iam-role:: ## Creates the AWS IAM role for Lambda
 		aws iam create-role \
@@ -64,6 +64,12 @@ lambda-invoke-function:: ## Invokes the AWS Lambda function
   		--log-type Tail  /dev/stderr \
   		--query 'LogResult' \
   		--output text
+
+lambda-update-function-code:: ## Updates the existing lambda function code by .zip
+		aws lambda update-function-code	\
+			--function-name checks2metrics \
+			--zip-file fileb://handler.zip \
+			--publish
 
 run:: ## Runs the executable
 		bin/checks2metrics
