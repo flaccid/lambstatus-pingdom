@@ -18,17 +18,17 @@ import (
 )
 
 var (
-  debugMode bool = false
+	debugMode bool = false
 )
 
 func main() {
-  factory.Ship(os.Getenv("LAMBSTATUS_ENDPOINT_URL"),
-			         os.Getenv("LAMBSTATUS_API_KEY"),
-			         os.Getenv("PINGDOM_USERNAME"),
-			         os.Getenv("PINGDOM_PASSWORD"),
-			         os.Getenv("PINGDOM_API_KEY"),
-			         os.Getenv("CHECK_TO_METRIC_MAP"),
-               debugMode)
+	factory.Ship(os.Getenv("LAMBSTATUS_ENDPOINT_URL"),
+		os.Getenv("LAMBSTATUS_API_KEY"),
+		os.Getenv("PINGDOM_USERNAME"),
+		os.Getenv("PINGDOM_PASSWORD"),
+		os.Getenv("PINGDOM_API_KEY"),
+		os.Getenv("CHECK_TO_METRIC_MAP"),
+		debugMode)
 }
 ```
 
