@@ -6,11 +6,11 @@ machine:
 
 jobs:
   build:
-    working_directory: /go/src/github.com/flaccid/lambstatus-pingdom
+    working_directory: /go/src/github.com/flaccid/lambstatus-pingdom/cli
     docker:
       - image: circleci/golang:1.8
     steps:
       - checkout
       - run: go get ./...
-      - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/checks2metrics -a -ldflags '-extldflags "-static"' cli/checks2metrics.go
-      - run: bin/checks2metrics help
+      - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../bin/checks2metrics -a -ldflags '-extldflags "-static"' checks2metrics.go
+      - run: ../bin/checks2metrics help
