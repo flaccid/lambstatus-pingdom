@@ -14,6 +14,9 @@ ROLE_POLICY := $(shell cat role_policy.json)
 build:: ## Builds the checks2metrics binary
 		@go build -o bin/checks2metrics cli/checks2metrics.go
 
+build-shim:: ## Builds the shim via docker
+		@make -f Makefile.shim
+
 build-static-linux:: ## Builds a static linux binary
 		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 			go build \
@@ -48,6 +51,11 @@ lambda-create-function:: ## Creates the AWS Lambda function
   		--role $(shell aws iam get-role --role-name lambda_basic_execution --query 'Role.Arn' --output text) \
   		--runtime python2.7 \
   		--handler handler.Handle || exit 1
+
+lambda-shim-dep:: ## Sets up the dependencies needed to build the shim and pack the handler
+		@docker pull eawsy/aws-lambda-go-shim:latest
+		@go get -u -d github.com/eawsy/aws-lambda-go-core/...
+		@wget -qO Makefile.shim https://git.io/vytH8
 
 lambda-invoke-function:: ## Invokes the AWS Lambda function
 		aws lambda invoke \
