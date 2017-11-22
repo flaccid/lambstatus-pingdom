@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/flaccid/lambstatus-pingdom.svg?style=svg)](https://circleci.com/gh/flaccid/lambstatus-pingdom)
+
 # lambstatus-pingdom
 
 Ship pingdom to lambstatus.
