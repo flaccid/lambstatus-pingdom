@@ -88,7 +88,7 @@ In reality, its most likely you'd like to run this every 1-2 minutes using http:
 
 You can automatically create a 1 minute schedule using (this is still a bit experimental):
 
-		$ make aws-create-scheduled-event
+    $ make aws-create-scheduled-event
 
 ### Building
 
