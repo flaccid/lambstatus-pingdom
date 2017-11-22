@@ -11,6 +11,20 @@ ROLE_POLICY := $(shell cat role_policy.json)
 
 .PHONY: docker-build docker-push
 
+aws-create-scheduled-event:: ## Creates a scheduled event with CloudWatch (every minute)
+		aws events put-rule \
+			--name checks2metrics \
+			--schedule-expression 'rate(1 minute)'
+		aws lambda add-permission \
+			--function-name checks2metrics \
+			--statement-id checks2metrics \
+			--action 'lambda:InvokeFunction' \
+			--principal events.amazonaws.com \
+			--source-arn $(shell aws events list-rules --name=checks2metrics  --query 'Rules[0].Arn' --output text) || true
+		aws events put-targets \
+			--rule checks2metrics \
+			--targets 'Id'='1','Arn'=$(shell aws lambda get-function --function-name checks2metrics --query 'Configuration.FunctionArn' --output text)
+
 build:: ## Builds the checks2metrics binary
 		@go build -o bin/checks2metrics cli/checks2metrics.go
 

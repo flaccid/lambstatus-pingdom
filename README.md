@@ -86,6 +86,9 @@ Note: you may need to first increase the function timeout.
 
 In reality, its most likely you'd like to run this every 1-2 minutes using http://docs.aws.amazon.com/lambda/latest/dg/with-scheduled-events.html.
 
+You can automatically create a 1 minute schedule using (this is still a bit experimental):
+
+		$ make aws-create-scheduled-event
 
 ### Building
 
