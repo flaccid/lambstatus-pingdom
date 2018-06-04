@@ -45,7 +45,7 @@ func Ship(lambStatusEndpoint string,
 		metricId := mapping[1]
 		checkDetails, err := pClient.Checks.Read(checkId)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
 		}
 		log.Debug("check details: %+v\n", checkDetails)
 		lastResponseTime := checkDetails.LastResponseTime
@@ -80,7 +80,7 @@ func Ship(lambStatusEndpoint string,
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
 		}
 
 		log.Debug("response status: ", resp.Status)
