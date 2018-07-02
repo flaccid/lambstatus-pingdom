@@ -45,51 +45,59 @@ func Ship(lambStatusEndpoint string,
 		metricId := mapping[1]
 		checkDetails, err := pClient.Checks.Read(checkId)
 		if err != nil {
-			log.Error(err)
-		}
-		log.Debug("check details: %+v\n", checkDetails)
-		lastResponseTime := checkDetails.LastResponseTime
-		lastTestTime := checkDetails.LastTestTime
+			// expect non-200 responses or complete fails
+			log.WithFields(log.Fields{
+				"pingdom check id":     checkId,
+				"lambstatus metric id": metricId,
+				"error":								err,
+				"index":								i,
+			}).Error("failure getting pingdom check")
+		} else {
+			log.Debug("check details: %+v\n", checkDetails)
+			lastResponseTime := checkDetails.LastResponseTime
+			lastTestTime := checkDetails.LastTestTime
 
-		dateStamp := time.Unix(lastTestTime, 0).Add(1).UTC().Format(time.RFC3339Nano)
-		var jsonPayLoad = []byte("{\"" + metricId + `": [{"timestamp": "` + dateStamp + `", "value": ` + fmt.Sprintf("%v", lastResponseTime) + `}]}`)
+			dateStamp := time.Unix(lastTestTime, 0).Add(1).UTC().Format(time.RFC3339Nano)
+			var jsonPayLoad = []byte("{\"" + metricId + `": [{"timestamp": "` + dateStamp + `", "value": ` + fmt.Sprintf("%v", lastResponseTime) + `}]}`)
 
-		log.WithFields(log.Fields{
-			"pingdom check id":     checkId,
-			"lambstatus metric id": metricId,
-			"last response time":   lastResponseTime,
-			"last test time":       lastTestTime,
-			"datestamp":            dateStamp,
-		}).Info(i, " ", checkDetails.Name)
-		log.Debug("JSON payload:", string(jsonPayLoad[:]))
+			log.WithFields(log.Fields{
+				"pingdom check id":     checkId,
+				"lambstatus metric id": metricId,
+				"last response time":   lastResponseTime,
+				"last test time":       lastTestTime,
+				"datestamp":            dateStamp,
+			}).Info(i, " ", checkDetails.Name)
+			log.Debug("JSON payload:", string(jsonPayLoad[:]))
 
-		url := lambStatusEndpoint + "/api/v0/metrics/data"
-		log.Debug("POST: ", url)
+			url := lambStatusEndpoint + "/api/v0/metrics/data"
+			log.Debug("POST: ", url)
 
-		// send to lambstatus
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayLoad))
-		req.Header.Set("x-api-key", lambStatusApiKey)
-		req.Header.Set("Content-Type", "application/json")
-		log.Debug("request", req)
+			// send to lambstatus
+			req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayLoad))
+			req.Header.Set("x-api-key", lambStatusApiKey)
+			req.Header.Set("Content-Type", "application/json")
+			log.Debug("request", req)
 
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Error(err)
-		}
-
-		log.Debug("response status: ", resp.Status)
-		log.Debug("response headers: ", resp.Header)
-		log.Debug("response body: ", string(body))
-
-		if resp.StatusCode != 200 {
-			log.Error("failed to post metric: ", resp.Status, " ", string(body))
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				// expect non-200 responses or complete fails
+				log.Errorf("failure sending metric to lambstatus: %s", err)
+			} else {
+				defer resp.Body.Close()
+				body, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					log.Error(err)
+				}	else {
+					log.Debug("response status: ", resp.Status)
+					log.Debug("response headers: ", resp.Header)
+					log.Debug("response body: ", string(body))
+				}
+				if resp.StatusCode != 200 {
+					log.Error("failed to post metric: ", resp.Status, " ", string(body))
+				}
+			}
 		}
 	}
-	log.Info("all checks shipped")
+	log.Info("all shippable checks shipped")
 }
