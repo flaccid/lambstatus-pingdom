@@ -49,8 +49,8 @@ func Ship(lambStatusEndpoint string,
 			log.WithFields(log.Fields{
 				"pingdom check id":     checkId,
 				"lambstatus metric id": metricId,
-				"error":								err,
-				"index":								i,
+				"error":                err,
+				"index":                i,
 			}).Error("failure getting pingdom check")
 		} else {
 			log.Debug("check details: %+v\n", checkDetails)
@@ -88,7 +88,7 @@ func Ship(lambStatusEndpoint string,
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
 					log.Error(err)
-				}	else {
+				} else {
 					log.Debug("response status: ", resp.Status)
 					log.Debug("response headers: ", resp.Header)
 					log.Debug("response body: ", string(body))
