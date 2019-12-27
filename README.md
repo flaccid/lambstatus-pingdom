@@ -46,7 +46,7 @@ Using the `checks2metrics` command, you can provide CLI options or just set the 
 - `LAMBSTATUS_ENDPOINT_URL` - LambStatus endpoint URL
 - `LAMBSTATUS_API_KEY` - LambStatus API key
 - `CHECK_TO_METRIC_MAP` - map of pingdom checks to lambstatus metrics;
-in format, `<pingdom_check_id>:<lambstatus_metric_id>,<pingdom_check_id>:<lambstatus_metric_id>`
+  in format, `<pingdom_check_id>:<lambstatus_metric_id>,<pingdom_check_id>:<lambstatus_metric_id>`
 
 Store your environment variables in `.env`.
 
@@ -90,6 +90,38 @@ You can automatically create a 1 minute schedule using (this is still a bit expe
 
     $ make aws-create-scheduled-event
 
+### GCP Cloud Functions
+
+#### Setup
+
+First, run the dependency generator to build a local vendor directory.
+
+    $ make cloudfunction-build-dep
+
+Then run build scripts to generate your local distribution.
+
+    $ make cloudfunction-build-dep
+
+A Google Storage bucket is required to store source deployments from.
+
+    $ gsutil mb gs://my-deployment-bucket/
+
+Then, copy the file to the target bucket.
+
+    $ gsutil cp deploy.zip gs://my-deployment-bucket/lambstatus-pingdom.zip
+
+Finally, deploy the function with gcloud. Note that the only supported region currently is `us-central1`.
+
+    $ gcloud functions deploy --runtime go111 --trigger-http --source="gs://my-deployment-bucket/lambstatus-pingdom.zip" --region=us-central1 --entry-point=HTTPHandle lambstatus-pingdom
+
+#### Running the Function
+
+    $ gcloud functions call lambstatus-pingdom --region=us-central1
+
+#### Scheduling the Function
+
+This lambda can be invoked by [Cloud Scheduler](https://console.cloud.google.com/cloudscheduler) via HTTP with a cron-schedule.
+
 ### Building
 
 #### CLI
@@ -114,8 +146,8 @@ Push to Docker Hub:
 
     $ docker push flaccid/checks2metrics
 
-License and Authors
--------------------
+## License and Authors
+
 - Author: Chris Fordham (<chris@fordham-nagy.id.au>)
 
 ```text
