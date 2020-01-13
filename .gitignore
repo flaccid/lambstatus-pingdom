@@ -2,3 +2,5 @@
 docker-compose.local.yml
 bin/*
 Makefile.shim
+*.zip
+vendor

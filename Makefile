@@ -9,7 +9,7 @@ ROLE_POLICY := $(shell cat role_policy.json)
 
 .DEFAULT_GOAL := help
 
-.PHONY: docker-build docker-push
+.PHONY: docker-build docker-push cloudfunction-build-dep
 
 aws-create-scheduled-event:: ## Creates a scheduled event with CloudWatch (every minute)
 		aws events put-rule \
@@ -84,6 +84,16 @@ lambda-update-function-code:: ## Updates the existing lambda function code by .z
 			--function-name checks2metrics \
 			--zip-file fileb://handler.zip \
 			--publish
+
+cloudfunction-build-dep:: ## Syncs and builds vendor dependencies
+		go get -u github.com/kardianos/govendor
+		govendor init
+		@govendor add +external
+		@govendor add github.com/eawsy/aws-lambda-go-core
+
+cloudfunction-build-release:: ## Builds a vendored zip for deploying to GCP
+		@rm deploy.zip
+		@zip -r deploy.zip vendor factory handler.go
 
 run:: ## Runs the executable
 		bin/checks2metrics
